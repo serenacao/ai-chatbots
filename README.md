@@ -14,8 +14,7 @@ What you implement:
 - Frame Agents in `src/lib/agents/*` (throw “not implemented” until you add logic).
 - Orchestrators in `src/lib/orchestrators/*` (also stubbed).
 
-
-## Step 0 — Fresh Setup (Tools + Local Run)
+## Setup and Run — Fresh Setup (Tools + Local Run)
 
 Install required tools (choose per OS):
 - Node.js 20.x (includes npm)
@@ -33,16 +32,15 @@ Clone and start the app:
 - `npm run dev`
 - Open `http://localhost:5173`
 
-Notes:
-- No global Svelte/SvelteKit install is needed — everything is local via npm.
-- This project uses Vite; hot reload works out of the box.
 
+## Getting Started — Get Your Gemini API Key via Google AI Studio
 
-## Step 1 — Get Your Gemini API Key (Google AI Studio)
+Per the instructions in Canvas, add Google API credits to a personal Google account. 
 
-Create an API key in Google AI Studio and add it to `.env`.
 
 Important: While you will use your `@mit.edu` email to get a coupon code for Gemini credits, do NOT claim credits using your `@mit.edu` email. Instead, use a personal Google account to avoid institutional billing/limits.
+
+Once you have credits added, you can create an API key in Google AI Studio and add it to `.env`.
 
 Steps:
 - Go to Google AI Studio (https://aistudio.google.com/)
@@ -57,47 +55,7 @@ GEMINI_MODEL=gemini-2.5-flash
 
 Restart `npm run dev` after changing `.env`.
 
-
-## Step 2 — Build Frame Agents
-
-Implement agents that each own one frame. 
-
-What to do:
-- Implement `propose(userMessage, context)` in each file.
-- Output a proposal object: `{ frame, value, rationale: string[], constraints: { rules?: string[], style?: object } }`.
-- Detect cues from the user’s message and recent history; add concrete constraints (e.g., “use numbered steps”, “avoid exclamations”).
-- You may call Gemini using `geminiGenerate()` and parse strict JSON with `extractJson()` from `src/lib/utils/text.js`.
-
-Tip: Keep prompts short and explicit about allowed values and required JSON shape. Experiment with [structured output](https://ai.google.dev/gemini-api/docs/structured-output) to ensure the agent is outputting the correct JSON.
-
-## Step 3 — Orchestrate Proposals
-
-Combine agent proposals into an activated frame set for the turn.
-
-Where:
-- `src/lib/orchestrators/SimpleOrchestrator.js` (basic merge)
-
-What to do:
-- Implement `orchestrate(proposals, prev)` to produce `{ frameSet, notes }`.
-- Then experiment with a more complex orchestrator. 
-
-Wire it in:
-- Update `src/lib/pipeline/FramePipeline.js` to instantiate your agents and orchestrator, then:
-  - collect `proposals = await Promise.all(agents.map(a => a.propose(...)))`
-  - `const { frameSet } = orchestrator.orchestrate(proposals, prevFrameSet)`
-  - pass `frameSet` to the replier
-
-
-## Step 4 — Experiment With The Replier
-
-Where: `src/lib/replier/Replier.js`
-
-Ideas:
-- Tune the system prompt: enforce tone/genre/goal more strongly, add examples.
-- Add stylistic rules from agent constraints (already scaffolded in comments).
-- Improve the local fallback template for when the model is unavailable.
-
-## Step 5 — Deploy (Vercel, Safely)
+## Safely Deploy to Vercel
 
 Set up Vercel and deploy without exposing secrets.
 
@@ -106,7 +64,7 @@ Reminder: do not commit `.env` or any API keys to Git.
 Steps:
 - Create a Vercel account and import your GitHub repo as a new project
 - In Vercel Project Settings → Environment Variables, add:
-  - `GEMINI_API_KEY` (Production/Preview/Development as appropriate)
+  - `GEMINI_API_KEY` 
   - `GEMINI_MODEL` (e.g., `gemini-2.5-flash`)
 - Trigger a deploy (Vercel builds and hosts your app)
 - Verify the app works at your Vercel URL
@@ -121,6 +79,5 @@ Safety reminders:
 
 - Start dev server: `npm run dev` (http://localhost:5173)
 - Build: `npm run build`
-- Preview production build: `npm run preview`
 
 Replier‑only mode: The pipeline currently bypasses agents/orchestrators and supplies default frames so you can chat immediately. As you implement agents/orchestrators, rewire the pipeline to use them.
