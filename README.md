@@ -1,4 +1,4 @@
-## A3: Multi‑agent Interaction (Frame Switching)
+## A3: Multi‑agent Interaction
 
 This starter guides you to build a frame‑sensitive conversational system in SvelteKit. You will design and implement frame agents, an orchestrator, and a replier so the system adapts its tone/genre/goals based on context.
 
@@ -14,7 +14,7 @@ What you implement:
 - Frame Agents in `src/lib/agents/*` (throw “not implemented” until you add logic).
 - Orchestrators in `src/lib/orchestrators/*` (also stubbed).
 
-## Setup and Run — Fresh Setup (Tools + Local Run)
+## Setup and Running the App
 
 Install required tools (choose per OS):
 - Node.js 20.x (includes npm)
@@ -32,11 +32,11 @@ Clone and start the app:
 - `npm run dev`
 - Open `http://localhost:5173`
 
+At this point, you should have a working app that you can use to chat with the replier; however, the replier will not be able to use the Gemini API because you have not yet added your API key to `.env`.
 
-## Getting Started — Get Your Gemini API Key via Google AI Studio
+## Getting Started with the Gemini API
 
 Per the instructions in Canvas, add Google API credits to a personal Google account. 
-
 
 Important: While you will use your `@mit.edu` email to get a coupon code for Gemini credits, do NOT claim credits using your `@mit.edu` email. Instead, use a personal Google account to avoid institutional billing/limits.
 
@@ -57,7 +57,7 @@ Restart `npm run dev` after changing `.env`.
 
 ## Safely Deploy to Vercel
 
-Set up Vercel and deploy without exposing secrets.
+After implementing the agents and orchestrators, you can set up Vercel and deploy your application without exposing secrets.
 
 Reminder: do not commit `.env` or any API keys to Git.
 
@@ -74,10 +74,7 @@ Safety reminders:
 - Never push secrets to Git; use Vercel Environment Variables only
 - Optionally rotate keys after testing
 
-
 ## Quick Dev Reference
 
 - Start dev server: `npm run dev` (http://localhost:5173)
 - Build: `npm run build`
-
-Replier‑only mode: The pipeline currently bypasses agents/orchestrators and supplies default frames so you can chat immediately. As you implement agents/orchestrators, rewire the pipeline to use them.
