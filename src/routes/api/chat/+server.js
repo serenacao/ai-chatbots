@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { JoySadOrchestrator } from '$lib/JoySadOrchestrator.js';
+import { Orchestrator } from '$lib/orchestrators/orchestrator.js';
 
 /**
  * Handle chat POST requests for a single-turn pipeline execution.
@@ -15,7 +15,7 @@ export async function POST({ request }) {
     return json({ error: 'history array is required' }, { status: 400 });
   }
 
-  const orchestrator = new JoySadOrchestrator();
+  const orchestrator = new Orchestrator();
 
   // Determine the latest user message from the provided history
   const lastUser = [...history].reverse().find((m) => m?.role === 'user');

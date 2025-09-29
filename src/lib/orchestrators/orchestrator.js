@@ -1,10 +1,10 @@
 // Orchestrator: single-prompt agent selection → agent respond
 
-import { geminiGenerate } from './gemini.js';
-import { JoyAgent } from './agents/JoyAgent.js';
-import { SadAgent } from './agents/SadAgent.js';
+import { geminiGenerate } from '../gemini.js';
+import { JoyAgent } from '../agents/JoyAgent.js';
+import { SadAgent } from '../agents/SadAgent.js';
 
-export class JoySadOrchestrator {
+export class Orchestrator {
   constructor() {
     this.name = 'joy_sad';
     this.joyAgent = new JoyAgent();
