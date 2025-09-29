@@ -1,8 +1,8 @@
 
 import { geminiGenerate } from '../gemini.js';
 
-export class StubAgent {
-  constructor() { this.name = 'stub'; }
+export class ExampleAgent {
+  constructor() { this.name = 'example'; }
 
   /**
    * Respond to the user with your agent's persona.
