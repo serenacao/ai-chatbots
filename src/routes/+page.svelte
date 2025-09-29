@@ -1,33 +1,15 @@
 <script>
   import { onMount } from 'svelte';
   
-
-  let sessionId = '';
   let input = '';
   let messages = [];
   let debugOpen = false;
-  let replierInput = null; // { frameSet, contextCount }
+  let replierInput = null; // { frameSet, contextCount, agent, reasons }
   let isLoading = false;
   let errorMsg = '';
   
 
-  function uuid() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      const r = (crypto.getRandomValues(new Uint8Array(1))[0] & 0xf) >> 0;
-      const v = c === 'x' ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    });
-  }
-
-  onMount(() => {
-    const stored = localStorage.getItem('a3-session-id');
-    if (stored) sessionId = stored;
-    else {
-      sessionId = uuid();
-      localStorage.setItem('a3-session-id', sessionId);
-    }
-    
-  });
+  onMount(() => {});
 
   async function send() {
     const content = input.trim();
@@ -39,7 +21,7 @@
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId, message: content })
+      body: JSON.stringify({ history: messages })
     });
     const data = await res.json();
     if (!res.ok || data?.error) {
@@ -188,11 +170,12 @@
 
 {#if debugOpen}
   <div class="debug">
-    <div><strong>Session:</strong> {sessionId}</div>
     <div><strong>Messages:</strong> {messages.length}</div>
     {#if replierInput}
       <div style="margin-top: 0.5rem;">
         <div><strong>Context Count:</strong> {replierInput.contextCount}</div>
+        <div><strong>Agent:</strong> {replierInput.agent || 'n/a'}</div>
+        <div><strong>Reason:</strong> {replierInput.reasons || 'n/a'}</div>
         <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; margin-top: 0.35rem;">
           {#each Object.entries(replierInput.frameSet?.frames || {}) as [name, p]}
             <div><strong>{name}</strong>: {p?.value}</div>

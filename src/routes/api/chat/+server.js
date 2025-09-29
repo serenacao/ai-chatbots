@@ -1,57 +1,31 @@
 import { json } from '@sveltejs/kit';
-import { getOrCreateSession, updateSession } from '$lib/state/sessionStore.js';
-import { FramePipeline } from '$lib/pipeline/FramePipeline.js';
+import { JoySadOrchestrator } from '$lib/JoySadOrchestrator.js';
 
 /**
  * Handle chat POST requests for a single-turn pipeline execution.
- *
- * Expects a JSON body: { sessionId, message, geminiKey? }.
- * - Creates or updates the session state.
- * - Runs the frame pipeline to get the assistant reply.
- * - Returns: { assistantMessage, history }.
- *
- * Errors:
- * - 400 if required fields are missing or Gemini key is missing.
- * - 500 on unexpected pipeline errors.
  *
  * Parameters: ({ request }) SvelteKit request wrapper.
  * Returns: JSON response with pipeline output or error.
  */
 export async function POST({ request }) {
   const body = await request.json();
-  const { sessionId, message } = body || {};
-  if (!sessionId || !message) {
-    return json({ error: 'sessionId and message are required' }, { status: 400 });
+  const { history } = body || {};
+  
+  if (!Array.isArray(history)) {
+    return json({ error: 'history array is required' }, { status: 400 });
   }
 
-  const session = getOrCreateSession(sessionId);
-  const pipeline = new FramePipeline({ orchestratorMode: 'replier_only' });
+  const orchestrator = new JoySadOrchestrator();
 
-  // Starter: pass the entirety of the conversation as context
-  const historyWithPending = [...session.history, { role: 'user', content: message }];
-  const context = { history: historyWithPending };
+  // Determine the latest user message from the provided history
+  const lastUser = [...history].reverse().find((m) => m?.role === 'user');
+  const message = lastUser?.content || '';
+  const context = { history };
 
   try {
-    const { assistantMessage, frameSet } = await pipeline.run({
-      userMessage: message,
-      context,
-      prevFrameSet: null
-    });
+    const { assistantMessage, frameSet, agent, reasons } = await orchestrator.orchestrate(message, context);
 
-    const userMsg = { role: 'user', content: message };
-    const assistantMsg = { role: 'assistant', content: assistantMessage };
-
-    const history = [...session.history, userMsg, assistantMsg];
-    updateSession(sessionId, { history });
-
-    return json({
-      assistantMessage,
-      history,
-      replierInput: {
-        frameSet,
-        contextCount: historyWithPending.length
-      }
-    });
+    return json({ assistantMessage, replierInput: { frameSet, contextCount: history.length, agent, reasons } });
 
   } catch (err) {
 
@@ -64,4 +38,3 @@ export async function POST({ request }) {
     return json({ error: 'Pipeline error', details: String(err?.message || err) }, { status: 500 });
   }
 }
-

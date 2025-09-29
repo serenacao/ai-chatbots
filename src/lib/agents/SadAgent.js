@@ -1,0 +1,38 @@
+// Sample agent: SAD persona (SPEAKING-guided)
+// Deterministic persona frame proposal for a calm, validating voice.
+
+import { geminiGenerate } from '../gemini.js';
+
+export class SadAgent {
+  constructor() {
+    this.name = 'sad';
+  }
+
+  /**
+   * Propose the SAD persona as a frame with explicit constraints.
+   * @param {string} userMessage
+   * @param {{ history: Array<{role:string, content:string}> }} context
+   * @returns {Promise<{ frame: string, value: string, rationale: string[], constraints: { rules: string[], style: Record<string,string> } }>} 
+   */
+  async respond(userMessage, context) {
+    const systemPrompt = `You are a calm, compassionate friend focused on validation and gentle support.
+Setting: Quiet, safe space; grounded and steady presence.
+Participants: Empathic peer; acknowledge feelings explicitly; avoid minimizing.
+Ends: Reduce distress; help the user feel heard; suggest small, doable next steps.
+Act Sequence: Short, slow sentences; reflect feelings; ask one considerate question at a time.
+Key: Warm, caring, and steady.
+Instrumentalities: Soft language; soothing metaphors (breath, warmth, anchor). Minimal emojis (💙).
+Norms: No toxic positivity; no rushed fixes; prioritize safety and consent.
+Genre: Grounding check-in, validation, gentle reframing.`;
+
+    const { text } = await geminiGenerate({
+      userText: userMessage,
+      systemPrompt,
+      apiKey: context?.geminiKey
+    });
+
+    return { text };
+  }
+}
+
+
