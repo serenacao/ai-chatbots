@@ -14,14 +14,12 @@ export class ExampleOrchestrator {
 
   async orchestrate(userMessage, context = {}) {
     const orchestratorPrompt = `
-
         //TODO: Replace the prompt with your orchestrator's guidance.
-
-        Latest user message:\n${userMessage}`;
+    `;
 
     const { text: orchestratorResponseText } = await geminiGenerate({
-      userText: orchestratorPrompt,
-      systemPrompt: '',
+      userText: userMessage,
+      systemPrompt: orchestratorPrompt,
       apiKey: context?.geminiKey,
       config: {
         responseMimeType: 'application/json',

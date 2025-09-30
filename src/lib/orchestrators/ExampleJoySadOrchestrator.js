@@ -24,7 +24,7 @@ export class Orchestrator {
         1) What emotions would best connect with the user right now, and what do they need (e.g., reassurance, validation, encouragement, caution)? Prioritize the latest user message while considering prior user messages with light recency weighting.
         2) Pick the agent whose voice best matches that need.
 
-        Available agents: joy, sad
+        Available agents: "joy", "sad". ONLY USE ONE OF THESE AGENTS.
 
         Constraints:
         - Speak only through structured output. No extra text.
@@ -35,14 +35,12 @@ export class Orchestrator {
         {
           "agent": "joy",
           "reasons": "User celebrated good news; needs warm encouragement"
-        }
+        }`;
 
-        Latest user message:\n${userMessage}`;
-
-    const { text: orchestratorResponseText } = await geminiGenerate({
-      userText: orchestratorPrompt,
-      systemPrompt: '',
+    const result = await geminiGenerate({
+      userText: userMessage,
       apiKey: context?.geminiKey,
+      systemPrompt: orchestratorPrompt,
       config: {
         responseMimeType: 'application/json',
         responseSchema: {
@@ -56,10 +54,11 @@ export class Orchestrator {
       }
     });
 
+
     let agent = 'sad';
     let reasons = 'Defaulted to sad';
     try {
-      const parsed = JSON.parse(orchestratorResponseText);
+      const parsed = JSON.parse(result.text);
       const rawAgent = String(parsed?.agent || '').toLowerCase();
       if (rawAgent === 'sad' || rawAgent === 'sadness') agent = 'sad';
       if (rawAgent === 'joy') agent = 'joy';

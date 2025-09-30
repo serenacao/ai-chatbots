@@ -2,16 +2,8 @@
 
 This starter guides you to build a frame‑sensitive conversational system in SvelteKit. You will design and implement frame agents, an orchestrator, and a replier so the system adapts its tone/genre/goals based on context.
 
-Out of the box, the app runs in “replier‑only” mode with default frames so you can chat immediately after setting your Gemini API key.
-
-What’s included:
-- SvelteKit UI with a chat panel and a small debug section. The debug section is there for your and course staff's testing.
-- Replier that uses Gemini (with a safe local fallback if the model fails).
-- Pipeline shell; agents and orchestrators are stubbed as TODOs.
-- Simple in‑memory session store.
-
 What you implement:
-- Frame Agents in `src/lib/agents/*` (throw “not implemented” until you add logic).
+- Agents in `src/lib/agents/*` 
 - Orchestrators in `src/lib/orchestrators/*` (also stubbed).
 
 ## Setup and Running the App

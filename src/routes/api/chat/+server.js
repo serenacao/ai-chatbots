@@ -20,6 +20,7 @@ export async function POST({ request }) {
   // Determine the latest user message from the provided history
   const lastUser = [...history].reverse().find((m) => m?.role === 'user');
   const message = lastUser?.content || '';
+
   const context = { history };
 
   try {
