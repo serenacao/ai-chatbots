@@ -1,6 +1,16 @@
 import { geminiGenerate } from '../gemini.js';
 import { ExampleAgent } from '../agents/Agent.js';
 
+const SELECTION_SCHEMA = {
+  type: 'OBJECT',
+  properties: {
+    agent: { type: 'STRING' },
+    reasons: { type: 'STRING' }
+  },
+  required: ['agent']
+};
+
+
 export class ExampleOrchestrator {
   constructor() {
     this.name = 'example';
@@ -23,14 +33,7 @@ export class ExampleOrchestrator {
       apiKey: context?.geminiKey,
       config: {
         responseMimeType: 'application/json',
-        responseSchema: {
-          type: 'OBJECT',
-          properties: {
-            agent: { type: 'STRING' },
-            reasons: { type: 'STRING' }
-          },
-          required: ['agent']
-        }
+        responseSchema: SELECTION_SCHEMA
       }
     });
 

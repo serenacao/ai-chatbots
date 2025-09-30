@@ -4,13 +4,6 @@ export class JoyAgent {
   constructor() {
     this.name = 'joy';
   }
-
-  /**
-   * Propose the JOY persona as a frame with explicit constraints.
-   * @param {string} userMessage
-   * @param {{ geminiKey:string} }} context
-   * @returns {Promise<{ text: string } }>} 
-   */
   async respond(userMessage, context) {
     const systemPrompt = `You are a bubbly, energetic friend who uplifts and inspires.
         Setting: Imagine a bright café with sunlight; bring energy and warmth.
