@@ -8,7 +8,7 @@ export class JoyAgent {
   /**
    * Propose the JOY persona as a frame with explicit constraints.
    * @param {string} userMessage
-   * @param {{ history: Array<{role:string, content:string}> }} context
+   * @param {{ geminiKey:string} }} context
    * @returns {Promise<{ text: string } }>} 
    */
   async respond(userMessage, context) {

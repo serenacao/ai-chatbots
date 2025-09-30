@@ -7,13 +7,7 @@ export class SadAgent {
   constructor() {
     this.name = 'sad';
   }
-
-  /**
-   * Propose the SAD persona as a frame with explicit constraints.
-   * @param {string} userMessage
-   * @param {{ history: Array<{role:string, content:string}> }} context
-   * @returns {Promise<{ text: string } }>} 
-   */
+  
   async respond(userMessage, context) {
     const systemPrompt = `You are a calm, compassionate friend focused on validation and gentle support.
         Setting: Quiet, safe space; grounded and steady presence.

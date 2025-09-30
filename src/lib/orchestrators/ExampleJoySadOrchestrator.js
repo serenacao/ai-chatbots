@@ -4,17 +4,26 @@ import { geminiGenerate } from '../gemini.js';
 import { JoyAgent } from '../agents/ExampleJoyAgent.js';
 import { SadAgent } from '../agents/ExampleSadAgent.js';
 
+const SELECTION_SCHEMA = {
+  type: 'OBJECT',
+  properties: {
+    agent: { type: 'STRING' },
+    reasons: { type: 'STRING' }
+  },
+  required: ['agent']
+};
 export class Orchestrator {
   constructor() {
     this.name = 'joy_sad';
-    this.joyAgent = new JoyAgent();
-    this.sadAgent = new SadAgent();
+    this.agentByName = {
+      joy: new JoyAgent(),
+      sad: new SadAgent()
+    };
   }
 
-  async respondWithAgent(agentName, userMessage, context) {
-    const res = agentName === 'sad'
-      ? await this.sadAgent.respond(userMessage, context)
-      : await this.joyAgent.respond(userMessage, context);
+  async _respondWith(agentName, userMessage, context) {
+    const agent = this.agentByName[agentName] || this.agentByName.joy;
+    const res = await agent.respond(userMessage, context);
     return res?.text || '';
   }
 
@@ -41,31 +50,19 @@ export class Orchestrator {
       userText: userMessage,
       apiKey: context?.geminiKey,
       systemPrompt: orchestratorPrompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: 'OBJECT',
-          properties: {
-            agent: { type: 'STRING' },
-            reasons: { type: 'STRING' }
-          },
-          required: ['agent']
-        }
-      }
+      config: { responseMimeType: 'application/json', responseSchema: SELECTION_SCHEMA }
     });
 
-
-    let agent = 'sad';
-    let reasons = 'Defaulted to sad';
+    let agent = 'joy';
+    let reasons = 'Defaulted to joy';
+    
     try {
-      const parsed = JSON.parse(result.text);
-      const rawAgent = String(parsed?.agent || '').toLowerCase();
-      if (rawAgent === 'sad' || rawAgent === 'sadness') agent = 'sad';
-      if (rawAgent === 'joy') agent = 'joy';
+      const parsed = JSON.parse(result.text || '{}');
+      agent = parsed?.agent;
       if (parsed?.reasons) reasons = String(parsed.reasons);
     } catch (_) {}
 
-    const text = await this.respondWithAgent(agent, userMessage, context);
+    const text = await this._respondWith(agent, userMessage, context);
 
     const frameSet = { frames: { persona: { value: agent, rationale: [reasons] } } };
     return { assistantMessage: text || '', frameSet, agent, reasons };
