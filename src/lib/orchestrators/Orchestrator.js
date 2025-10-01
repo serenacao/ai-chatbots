@@ -10,7 +10,6 @@ const SELECTION_SCHEMA = {
   required: ['agent']
 };
 
-
 export class ExampleOrchestrator {
   constructor() {
     this.name = 'example';
@@ -22,26 +21,28 @@ export class ExampleOrchestrator {
     return res?.text || '';
   }
 
-  async orchestrate(userMessage, context = {}) {
+  async orchestrate(contents) {
     const orchestratorPrompt = `
         //TODO: Replace the prompt with your orchestrator's guidance.
     `;
 
-    const { text: orchestratorResponseText } = await geminiGenerate({
-      userText: userMessage,
+    const result = await geminiGenerate({
+      contents,
       systemPrompt: orchestratorPrompt,
-      apiKey: context?.geminiKey,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: SELECTION_SCHEMA
-      }
+      config: { responseMimeType: 'application/json',responseSchema: SELECTION_SCHEMA }
     });
+
 
     let agent = 'example';
     let reasons = 'Defaulted to example';
+
     try {
+
+      let orchestratorResponseText = result.text;
+
       const parsed = JSON.parse(orchestratorResponseText);
       const rawAgent = String(parsed?.agent || '').toLowerCase();
+      
       if (rawAgent === 'example') agent = 'example';
       if (parsed?.reasons) reasons = String(parsed.reasons);
     } catch (_) {}

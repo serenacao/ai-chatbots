@@ -5,16 +5,22 @@ export function hasGemini(overrideKey) {
     return Boolean(overrideKey || env.GEMINI_API_KEY);
 }
 
-export async function geminiGenerate({ userText, systemPrompt = '', apiKey, config }) {
-    const key = apiKey || env.GEMINI_API_KEY;
+export async function geminiGenerate({ contents, systemPrompt = '', config ={} }) {
+    const key =  env.GEMINI_API_KEY;
     if (!key) throw new Error('GEMINI_API_KEY not set');
 
     const ai = new GoogleGenAI({ apiKey: key });
+    if (systemPrompt) {
+        config.systemInstruction = { role: 'model', parts: [{ text: systemPrompt }] };
+    }
 
-    config = config || {};
-    config.systemInstruction = config.systemInstruction || systemPrompt;
+    const request = {
+        model: 'gemini-2.5-flash',
+        contents: contents,
+        config: config
+    };
 
-    const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: userText, config });
+    const response = await ai.models.generateContent(request);
     const text = typeof response?.text === 'string' ? response.text : '';
     return { text, raw: response };
 }

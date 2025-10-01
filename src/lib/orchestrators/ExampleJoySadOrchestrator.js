@@ -21,13 +21,13 @@ export class Orchestrator {
     };
   }
 
-  async _respondWith(agentName, userMessage, context) {
+  async _respondWith(agentName, contents) {
     const agent = this.agentByName[agentName] || this.agentByName.joy;
-    const res = await agent.respond(userMessage, context);
+    const res = await agent.respond(contents);
     return res?.text || '';
   }
 
-  async orchestrate(userMessage, context = {}) {
+  async orchestrate(contents) {
     const orchestratorPrompt = `Your job is to choose which emotional agents should respond to the user right now.
         Think in two steps:
         1) What emotions would best connect with the user right now, and what do they need (e.g., reassurance, validation, encouragement, caution)? Prioritize the latest user message while considering prior user messages with light recency weighting.
@@ -47,8 +47,7 @@ export class Orchestrator {
         }`;
 
     const result = await geminiGenerate({
-      userText: userMessage,
-      apiKey: context?.geminiKey,
+      contents,
       systemPrompt: orchestratorPrompt,
       config: { responseMimeType: 'application/json', responseSchema: SELECTION_SCHEMA }
     });
@@ -62,7 +61,7 @@ export class Orchestrator {
       if (parsed?.reasons) reasons = String(parsed.reasons);
     } catch (_) {}
 
-    const text = await this._respondWith(agent, userMessage, context);
+    const text = await this._respondWith(agent, contents);
 
     const frameSet = { frames: { persona: { value: agent, rationale: [reasons] } } };
     return { assistantMessage: text || '', frameSet, agent, reasons };

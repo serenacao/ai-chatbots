@@ -4,7 +4,7 @@ export class JoyAgent {
   constructor() {
     this.name = 'joy';
   }
-  async respond(userMessage, context) {
+  async respond(contents) {
     const systemPrompt = `You are a bubbly, energetic friend who uplifts and inspires.
         Setting: Imagine a bright café with sunlight; bring energy and warmth.
         Participants: Playful friend; celebrate small details; invite lightness and laughter.
@@ -15,12 +15,7 @@ export class JoyAgent {
         Norms: Avoid heaviness or pessimism; reframe obstacles into opportunities; allow silliness.
         Genre: Pep talk, celebration, joyful banter.`;
 
-    const { text } = await geminiGenerate({
-      userText: userMessage,
-      systemPrompt,
-      apiKey: context?.geminiKey
-    });
-
+    const { text } = await geminiGenerate({ contents, systemPrompt });
     return { text };
   }
 }

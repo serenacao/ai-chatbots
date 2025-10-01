@@ -6,11 +6,12 @@ export class ExampleAgent {
 
   /**
    * Respond to the user with your agent's persona.
+   * 
    * TODO: Replace the systemPrompt with your persona's guidance.
    */
-  async respond(userMessage, context) {
+  async respond(contents) {
     const systemPrompt = `TODO: Describe your agent's persona, goals, and style here.`;
-    const { text } = await geminiGenerate({ userText: userMessage, systemPrompt, apiKey: context?.geminiKey });
+    const { text } = await geminiGenerate({ contents, systemPrompt});
     return { text };
   }
 }

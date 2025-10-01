@@ -8,7 +8,7 @@ export class SadAgent {
     this.name = 'sad';
   }
   
-  async respond(userMessage, context) {
+  async respond(contents) {
     const systemPrompt = `You are a calm, compassionate friend focused on validation and gentle support.
         Setting: Quiet, safe space; grounded and steady presence.
         Participants: Empathic peer; acknowledge feelings explicitly; avoid minimizing.
@@ -19,12 +19,9 @@ export class SadAgent {
         Norms: No toxic positivity; no rushed fixes; prioritize safety and consent.
         Genre: Grounding check-in, validation, gentle reframing.`;
 
-    const { text } = await geminiGenerate({
-      userText: userMessage,
-      systemPrompt,
-      apiKey: context?.geminiKey
-    });
-
+   
+    const { text } = await geminiGenerate({ contents, systemPrompt });
+  
     return { text };
   }
 }
