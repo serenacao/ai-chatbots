@@ -16,6 +16,8 @@ const SELECTION_SCHEMA = {
 // Store counts outside the class to persist between instances
 let globalDoompostCount = 0;
 let enthusiasmCount = 0;
+let lastUsedAgent = null;
+let consecutiveAgentCount = 0;
 
 const ENTHUSIASM_SCHEMA = {
   type: 'OBJECT',
@@ -87,26 +89,34 @@ Examples:
       agent = parsed?.agent?.toLowerCase() || agent;
       reasons = parsed?.reasons || reasons;
 
-      // Track consecutive doomposting and override if needed
-      if (agent === 'doomposting') {
-        globalDoompostCount++;
-        console.log('Doompost count increased to:', globalDoompostCount);
-        
-        if (globalDoompostCount >= 2) {
-          agent = 'brainrot';
-          reasons = 'Redirecting to brainrot after 2 consecutive doomposting messages to lift mood';
-          globalDoompostCount = 0;
-          console.log('Reset doompost count after intervention');
-        }
-      } else {
-        if (globalDoompostCount > 0) {
-          console.log('Reset doompost count due to non-doompost message');
-          globalDoompostCount = 0;
-        }
-      }
+      
     } catch (err) {
       console.error('Router error:', err);
     }
+
+    // Agent switching logic: if same agent used 2+ times consecutively, switch to random other agent
+    if (lastUsedAgent === agent) {
+      consecutiveAgentCount++;
+      console.log(`Same agent (${agent}) used ${consecutiveAgentCount} times consecutively`);
+      
+      if (consecutiveAgentCount >= 2) {
+        const availableAgents = Object.keys(this.agents).filter(a => a !== agent);
+        if (availableAgents.length > 0) {
+          const randomIndex = Math.floor(Math.random() * availableAgents.length);
+          const newAgent = availableAgents[randomIndex];
+          console.log(`Switching from ${agent} to ${newAgent} to avoid repetition`);
+          agent = newAgent;
+          reasons = `Switched to ${newAgent} to avoid using ${lastUsedAgent} consecutively`;
+          consecutiveAgentCount = 0;
+        }
+      }
+    } else {
+      // Different agent, reset counter
+      consecutiveAgentCount = 0;
+    }
+    
+    // Update tracking
+    lastUsedAgent = agent;
 
     console.log('Routing decision:', { agent, reasons });
 
