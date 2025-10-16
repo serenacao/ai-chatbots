@@ -1,7 +1,7 @@
 
 import { geminiGenerate } from '../gemini.js';
 
-export class ExampleAgent {
+export class BasicAgent {
   constructor() { this.name = 'example'; }
 
   /**
@@ -9,9 +9,11 @@ export class ExampleAgent {
    * 
    * TODO: Replace the systemPrompt with your persona's guidance.
    */
-  async respond(contents) {
-    const systemPrompt = `TODO: Describe your agent's persona, goals, and style here.`;
+  async respond(contents, wc) {
+    const random = Math.floor(5*Math.random());
+    const randomWC = random + wc
+    const systemPrompt = `You are a normal person. Respond to the user in ${randomWC} words or less. Always try your best to empathize with the user.`;
     const { text } = await geminiGenerate({ contents, systemPrompt});
-    return { text };
+    return text ;
   }
 }

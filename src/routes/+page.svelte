@@ -7,9 +7,20 @@
   let replierInput = null; // { frameSet, contextCount, agent, reasons }
   let isLoading = false;
   let errorMsg = '';
+  let currentTemperature = null; // { value, category, color, bgColor, description }
   
 
   onMount(() => {});
+
+  // Apply temperature class to body
+  $: if (currentTemperature) {
+    console.log('Applying temperature class:', currentTemperature.category);
+    // Remove any existing temperature classes
+    document.body.classList.remove('temp-cool', 'temp-neutral', 'temp-warm', 'temp-hot');
+    // Add the new temperature class
+    document.body.classList.add(`temp-${currentTemperature.category}`);
+    console.log('Body classes after update:', document.body.className);
+  }
 
   async function send() {
     const content = input.trim();
@@ -32,6 +43,8 @@
     if (data.assistantMessage) {
       messages = [...messages, { role: 'assistant', content: data.assistantMessage }];
       replierInput = data.replierInput || null;
+      currentTemperature = data.temperature || null;
+      console.log('Temperature data:', currentTemperature);
     }
     isLoading = false;
   }
@@ -59,6 +72,32 @@
                 linear-gradient(180deg, var(--bg-grad-a), var(--bg-grad-b));
     color: var(--text);
     font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+    transition: background 0.5s ease;
+  }
+
+  /* Temperature-based background styles */
+  :global(body.temp-cool) {
+    background: radial-gradient(1200px 600px at 20% -10%, rgba(59,130,246,0.3), transparent),
+                radial-gradient(900px 500px at 100% 0%, rgba(147,197,253,0.2), transparent),
+                linear-gradient(180deg, #1e3a8a, #1e40af) !important;
+  }
+
+  :global(body.temp-neutral) {
+    background: radial-gradient(1200px 600px at 20% -10%, rgba(107,114,128,0.25), transparent),
+                radial-gradient(900px 500px at 100% 0%, rgba(156,163,175,0.18), transparent),
+                linear-gradient(180deg, var(--bg-grad-a), var(--bg-grad-b)) !important;
+  }
+
+  :global(body.temp-warm) {
+    background: radial-gradient(1200px 600px at 20% -10%, rgba(245,158,11,0.3), transparent),
+                radial-gradient(900px 500px at 100% 0%, rgba(251,191,36,0.25), transparent),
+                linear-gradient(180deg, #92400e, #b45309) !important;
+  }
+
+  :global(body.temp-hot) {
+    background: radial-gradient(1200px 600px at 20% -10%, rgba(239,68,68,0.35), transparent),
+                radial-gradient(900px 500px at 100% 0%, rgba(252,165,165,0.25), transparent),
+                linear-gradient(180deg, #991b1b, #dc2626) !important;
   }
 
   :global(*), :global(*::before), :global(*::after) { box-sizing: border-box; }
@@ -129,6 +168,12 @@
   <div class="subtle">Conversational demo</div>
   <div class="toolbar" style="margin: 0.5rem 0 0.75rem 0;">
     <button class="secondary" on:click={() => (debugOpen = !debugOpen)}>{debugOpen ? 'Hide' : 'Show'} Debug</button>
+    {#if currentTemperature}
+      <div class="temperature-indicator" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: {currentTemperature.bgColor}; color: {currentTemperature.color}; border-radius: 8px; font-size: 0.9rem;">
+        <div class="temp-dot" style="width: 12px; height: 12px; background: {currentTemperature.color}; border-radius: 50%;"></div>
+        <span>{currentTemperature.description} ({Math.round(currentTemperature.value * 100)}%)</span>
+      </div>
+    {/if}
   </div>
 
   {#if errorMsg}
@@ -171,6 +216,13 @@
 {#if debugOpen}
   <div class="debug">
     <div><strong>Messages:</strong> {messages.length}</div>
+    {#if currentTemperature}
+      <div style="margin-top: 0.5rem;">
+        <div><strong>Temperature:</strong> {currentTemperature.category} ({Math.round(currentTemperature.value * 100)}%)</div>
+        <div><strong>Description:</strong> {currentTemperature.description}</div>
+        <div><strong>Color:</strong> {currentTemperature.color}</div>
+      </div>
+    {/if}
     {#if replierInput}
       <div style="margin-top: 0.5rem;">
         <div><strong>Context Count:</strong> {replierInput.contextCount}</div>

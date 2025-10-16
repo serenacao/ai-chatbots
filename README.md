@@ -70,3 +70,5 @@ Safety reminders:
 
 - Start dev server: `npm run dev` (http://localhost:5173)
 - Build: `npm run build`
+- start with routing orchestration `ORCHESTRATOR=routing npm run dev`
+- start with synergizing orchestration `ORCHESTRATOR=synergize npm run dev`
